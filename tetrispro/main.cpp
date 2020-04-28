@@ -35,9 +35,10 @@ void Rotate();
 void Move(int dx);
 void Tick(float time);
 bool Check();
+void CheckLines();
 
-Texture t;
-Sprite s;
+Texture t1, t2, t3;
+Sprite s, background, frame;
 RenderWindow window(VideoMode(320, 480), "The Game");
 
 int main()
@@ -63,8 +64,9 @@ int main()
 			}
 		}
 		if (Keyboard::isKeyPressed(Keyboard::Down))
-			delay = 0.05;
+			delay = 0.05f;
 		Tick(time);
+		CheckLines();
 		Draw();
 	}
 	return 0;
@@ -73,14 +75,19 @@ int main()
 //³õÊ¼»¯ËØ²Ä
 void GameInit()
 {
-	t.loadFromFile("tiles.png");
-	s = Sprite(t);
+	t1.loadFromFile("images/tiles.png");
+	t2.loadFromFile("images/background.png");
+	t3.loadFromFile("images/frame.png");
+	s = Sprite(t1);
+	background = Sprite(t2);
+	frame = Sprite(t3);
 }
 
 //»­Í¼
 void Draw()
 {
 	window.clear(Color::White);
+	window.draw(background);
 
 	for (int i = 0; i < HEIGHT; i++)
 	{
@@ -90,6 +97,7 @@ void Draw()
 				continue;
 			s.setTextureRect(IntRect(map[i][j]*SIZE, 0, SIZE, SIZE));
 			s.setPosition(j * SIZE, i * SIZE);
+			s.move(28, 31);
 			window.draw(s);
 		}
 	}
@@ -97,11 +105,15 @@ void Draw()
 	{
 		s.setTextureRect(IntRect(colorNum*SIZE, 0, SIZE, SIZE));
 		s.setPosition(a[i].x * SIZE, a[i].y * SIZE);
+		s.move(28, 31);
 		window.draw(s);
 	}
+	window.draw(frame);
 	window.display();
 }
 
+
+//Éú³É·½¿é
 void CreateTetris()
 {
 	srand(time(0));
@@ -115,6 +127,7 @@ void CreateTetris()
 	tetrisExist = 1;
 }
 
+//¿ØÖÆ
 void ControlTetris(Event e)
 {
 	if (e.key.code == Keyboard::Up)
@@ -125,6 +138,7 @@ void ControlTetris(Event e)
 		Move(1);
 }
 
+//Ðý×ª
 void Rotate()
 {
 
@@ -146,6 +160,7 @@ void Rotate()
 	}
 }
 
+//ÒÆ¶¯
 void Move(int dx)
 {
 	for (int i = 0; i < 4; i++)
@@ -162,6 +177,7 @@ void Move(int dx)
 	}
 }
 
+//ÏÂÂä
 void Tick(float time)
 {
 	timer += time;
@@ -181,10 +197,11 @@ void Tick(float time)
 			tetrisExist = 0;
 		}
 		timer = 0;
-		delay = 0.3;
+		delay = 0.3f;
 	}
 }
 
+//±ß½çÅö×²¼ì²â
 bool Check()
 {
 	for (int i = 0; i < 4; i++)
@@ -195,4 +212,22 @@ bool Check()
 			return 0;
 	}
 	return 1;
+}
+
+//Ïû³ý¼ì²â
+void CheckLines()
+{
+	int line = HEIGHT - 1;
+	for (int i = HEIGHT - 1; i > 0; i--)
+	{
+		int count = 0;
+		for (int j = 0; j < WIDTH; j++)
+		{
+			if (map[i][j])
+				count++;
+			map[line][j] = map[i][j];
+		}
+		if (count < WIDTH)
+			line--;
+	}
 }
