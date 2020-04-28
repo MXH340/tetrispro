@@ -22,8 +22,10 @@ int figures[7][4] =
 	3,5,7,6, // J
 	2,3,4,5, // O
 };
-//int map[HEIGHT][WIDTH] = { 0 };
+int map[HEIGHT][WIDTH] = { 0 };
+bool tetrisExist = 0;
 //int colorNum = 1;
+float timer = 0, delay = 0.3;
 
 void GameInit();
 void Draw();
@@ -31,28 +33,35 @@ void CreateTetris();
 void ControlTetris(Event e);
 void Rotate();
 void Move(int dx);
+void Tick(float time);
 
 Texture t;
 Sprite s;
 RenderWindow window(VideoMode(320, 480), "The Game");
-bool tetrisExist = 0;
 
 int main()
 {
+	Clock clock;
 	GameInit();
 	while (window.isOpen())
 	{
 		Event e;
+		if (!tetrisExist)
+			CreateTetris();
+		float time = clock.getElapsedTime().asSeconds();
+		clock.restart();
+		Tick(time);
 		while (window.pollEvent(e))
 		{
 			if (e.type == Event::Closed)
+			{
 				window.close();
-			
+			}
 			else if (e.type == Event::KeyPressed)
+			{
 				ControlTetris(e);
+			}
 		}
-		if (!tetrisExist)
-			CreateTetris();
 		Draw();
 	}
 	return 0;
@@ -63,6 +72,7 @@ void GameInit()
 {
 	t.loadFromFile("tiles.png");
 	s = Sprite(t);
+	s.setTextureRect(IntRect(0, 0, SIZE, SIZE));
 }
 
 //»­Í¼
@@ -71,7 +81,6 @@ void Draw()
 	window.clear(Color::White);
 	for (int i = 0; i < 4; i++)
 	{
-		s.setTextureRect(IntRect(0, 0, SIZE, SIZE));
 		s.setPosition(a[i].x * 18, a[i].y * 18);
 		window.draw(s);
 	}
@@ -101,6 +110,7 @@ void ControlTetris(Event e)
 
 void Rotate()
 {
+
 	Point p = a[1];
 	for (int i = 0; i < 4; i++)
 	{
@@ -116,5 +126,16 @@ void Move(int dx)
 	for (int i = 0; i < 4; i++)
 	{
 		a[i].x += dx;
+	}
+}
+
+void Tick(float time)
+{
+	timer += time;
+	if (timer > delay)
+	{
+		for (int i = 0; i < 4; i++)
+			a[i].y += 1;
+		timer = 0;
 	}
 }
