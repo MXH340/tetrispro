@@ -51,7 +51,6 @@ int main()
 			CreateTetris();
 		float time = clock.getElapsedTime().asSeconds();
 		clock.restart();
-		Tick(time);
 		while (window.pollEvent(e))
 		{
 			if (e.type == Event::Closed)
@@ -63,6 +62,9 @@ int main()
 				ControlTetris(e);
 			}
 		}
+		if (Keyboard::isKeyPressed(Keyboard::Down))
+			delay = 0.05;
+		Tick(time);
 		Draw();
 	}
 	return 0;
@@ -73,7 +75,6 @@ void GameInit()
 {
 	t.loadFromFile("tiles.png");
 	s = Sprite(t);
-	s.setTextureRect(IntRect(0, 0, SIZE, SIZE));
 }
 
 //»­Í¼
@@ -87,12 +88,14 @@ void Draw()
 		{
 			if (map[i][j] == 0)
 				continue;
+			s.setTextureRect(IntRect(map[i][j]*SIZE, 0, SIZE, SIZE));
 			s.setPosition(j * SIZE, i * SIZE);
 			window.draw(s);
 		}
 	}
 	for (int i = 0; i < 4; i++)
 	{
+		s.setTextureRect(IntRect(colorNum*SIZE, 0, SIZE, SIZE));
 		s.setPosition(a[i].x * SIZE, a[i].y * SIZE);
 		window.draw(s);
 	}
@@ -178,6 +181,7 @@ void Tick(float time)
 			tetrisExist = 0;
 		}
 		timer = 0;
+		delay = 0.3;
 	}
 }
 
